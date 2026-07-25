@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#2D6A4F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Rellano</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FAFAF7;
+  --surface: #FFFFFF;
+  --card: #FFFFFF;
+  --card-alt: #F5F4F0;
+  --accent: #2D6A4F;
+  --accent-light: #40916C;
+  --accent-soft: rgba(45,106,79,0.08);
+  --accent-soft2: rgba(45,106,79,0.15);
+  --warm: #D4A373;
+  --warm-soft: rgba(212,163,115,0.12);
+  --danger: #C1121F;
+  --danger-soft: rgba(193,18,31,0.08);
+  --info: #457B9D;
+  --info-soft: rgba(69,123,157,0.10);
+  --orange: #E76F51;
+  --orange-soft: rgba(231,111,81,0.10);
+  --text: #1D1D1B;
+  --text-sec: #5C5C57;
+  --text-dim: #9C9C95;
+  --border: rgba(0,0,0,0.06);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+  --font: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'SF Mono', 'Menlo', 'Consolas', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: var(--font); background: var(--bg); color: var(--text);
+  max-width: 430px; margin: 0 auto; min-height: 100dvh;
+  overflow-x: hidden; -webkit-font-smoothing: antialiased;
+}
+input, textarea, button, select { font-family: var(--font); }
+button { cursor: pointer; }
+.screen { display: none; padding-bottom: 72px; min-height: 100dvh; }
+.screen.active { display: block; }
+
+/* Bottom Nav */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 430px; background: var(--surface);
+  border-top: 1px solid var(--border); display: flex; justify-content: space-around;
+  padding: 4px 0 env(safe-area-inset-bottom, 6px); z-index: 100;
+}
+.nav-btn {
+  background: none; border: none; display: flex; flex-direction: column;
+  align-items: center; gap: 1px; padding: 6px 10px; color: var(--text-dim);
+  transition: color 0.2s; position: relative; font-family: var(--font);
+}
+.nav-btn.active { color: var(--accent); }
+.nav-btn .icon { font-size: 18px; }
+.nav-btn .label { font-size: 9px; font-weight: 600; letter-spacing: 0.03em; }
+.nav-badge {
+  position: absolute; top: 1px; right: 4px; background: var(--danger);
+  color: #fff; font-size: 8px; font-weight: 700; border-radius: 10px;
+  min-width: 14px; height: 14px; display: flex; align-items: center; justify-content: center;
+}
+
+/* Common */
+.page-header { padding: 20px 20px 8px; }
+.page-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+.page-subtitle { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+.section-title {
+  font-size: 11px; font-weight: 700; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 10px;
+}
+.content { padding: 8px 20px 100px; }
+.card {
+  background: var(--card); border-radius: var(--radius); padding: 16px;
+  border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 10px;
+}
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 6px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.02em;
+}
+.badge-accent { color: var(--accent); background: var(--accent-soft); }
+.badge-danger { color: var(--danger); background: var(--danger-soft); }
+.badge-info { color: var(--info); background: var(--info-soft); }
+.badge-orange { color: var(--orange); background: var(--orange-soft); }
+.badge-warm { color: var(--warm); background: var(--warm-soft); }
+
+.btn {
+  width: 100%; padding: 14px; border: none; border-radius: 12px;
+  font-size: 14px; font-weight: 700; transition: all 0.2s;
+}
+.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 16px rgba(45,106,79,0.25); }
+.btn-primary:disabled { background: var(--card-alt); color: var(--text-dim); box-shadow: none; }
+.btn-secondary { background: var(--card-alt); color: var(--text); border: none; }
+
+.input-plate {
+  width: 100%; padding: 16px; font-size: 26px; font-weight: 800;
+  background: var(--card-alt); border: 2px solid var(--border); border-radius: var(--radius);
+  color: var(--text); text-align: center; letter-spacing: 0.12em; outline: none;
+  font-family: var(--mono); transition: border-color 0.2s;
+}
+.input-plate:focus, .input-plate.valid { border-color: var(--accent); }
+
+.pill-group { display: flex; gap: 6px; margin: 12px 0; }
+.pill {
+  padding: 8px 16px; border-radius: 20px; border: none;
+  font-size: 12px; font-weight: 600; background: var(--card-alt); color: var(--text-sec);
+}
+.pill.active { background: var(--accent); color: #fff; }
+
+.incident-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.incident-btn {
+  padding: 12px 10px; background: var(--card-alt); border: 2px solid transparent;
+  border-radius: 12px; display: flex; align-items: center; gap: 8px; text-align: left;
+}
+.incident-btn.selected { background: var(--accent-soft); border-color: var(--accent); }
+.incident-btn .icon { font-size: 18px; }
+.incident-btn .text { font-size: 11px; font-weight: 600; color: var(--text-sec); }
+.incident-btn.selected .text { color: var(--accent); }
+
+.progress-bar { display: flex; gap: 6px; margin-bottom: 16px; }
+.progress-step { flex: 1; height: 3px; border-radius: 2px; background: var(--card-alt); transition: background 0.3s; }
+.progress-step.active { background: var(--accent); }
+
+.success-screen { padding: 80px 20px; text-align: center; }
+.success-icon {
+  width: 72px; height: 72px; border-radius: 50%; background: var(--accent-soft);
+  display: flex; align-items: center; justify-content: center; font-size: 36px;
+  margin: 0 auto 16px;
+}
+
+.module-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 24px; }
+.module-btn {
+  background: var(--card-alt); border: none; border-radius: 12px; padding: 12px 4px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.module-btn .icon { font-size: 22px; }
+.module-btn .label { font-size: 9px; font-weight: 600; color: var(--text-sec); }
+
+.quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.quick-btn {
+  padding: 18px 14px; border: none; border-radius: var(--radius);
+  display: flex; align-items: center; gap: 10px; text-align: left;
+}
+.quick-btn-primary { background: var(--accent); box-shadow: 0 4px 16px rgba(45,106,79,0.25); }
+.quick-btn-primary .title { font-size: 13px; font-weight: 700; color: #fff; }
+.quick-btn-primary .sub { font-size: 10px; color: rgba(255,255,255,0.7); }
+.quick-btn-secondary { background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow); }
+.quick-btn-secondary .title { font-size: 13px; font-weight: 700; color: var(--text); }
+.quick-btn-secondary .sub { font-size: 10px; color: var(--text-dim); }
+.quick-btn .icon { font-size: 22px; }
+
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.stat-card {
+  background: var(--card-alt); border-radius: 12px; padding: 12px; text-align: center;
+}
+.stat-num { font-size: 22px; font-weight: 800; color: var(--accent); }
+.stat-label { font-size: 10px; font-weight: 600; color: var(--text-sec); }
+.stat-sub { font-size: 9px; color: var(--text-dim); }
+
+.notif-item {
+  display: flex; gap: 10px; padding: 12px 14px; border-radius: 12px;
+  margin-bottom: 6px; cursor: pointer; border: 1px solid var(--border);
+}
+.notif-item.unread { background: var(--accent-soft); border-color: transparent; }
+
+.space-card {
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+}
+.space-icon {
+  width: 48px; height: 48px; border-radius: 12px; background: var(--card-alt);
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+}
+.slot-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.slot-btn {
+  padding: 14px 8px; border-radius: var(--radius-sm); border: 2px solid transparent;
+  background: var(--card); box-shadow: var(--shadow); text-align: center;
+}
+.slot-btn.selected { border-color: var(--accent); background: var(--accent-soft); }
+.slot-btn.taken { opacity: 0.4; box-shadow: none; background: var(--card-alt); cursor: default; }
+.slot-time { font-size: 15px; font-weight: 700; }
+.slot-status { font-size: 9px; font-weight: 600; margin-top: 2px; }
+
+.day-scroll { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 4px; }
+.day-btn {
+  padding: 8px 14px; border-radius: var(--radius-sm); border: none; white-space: nowrap;
+  font-size: 12px; font-weight: 600; background: var(--card-alt); color: var(--text-sec);
+}
+.day-btn.active { background: var(--accent); color: #fff; }
+
+.post-card { position: relative; }
+.post-avatar {
+  width: 36px; height: 36px; border-radius: 10px; display: flex;
+  align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0;
+}
+.post-avatar.admin { background: var(--accent-soft); color: var(--accent); }
+.post-avatar.user { background: var(--card-alt); color: var(--text-sec); }
+
+.menu-item {
+  display: flex; align-items: center; gap: 14px; padding: 14px;
+  background: var(--card); border-radius: 12px; margin-bottom: 6px;
+  border: 1px solid var(--border); cursor: pointer;
+}
+.menu-icon {
+  width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--card-alt);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+
+/* Auth screens */
+.auth-screen {
+  min-height: 100dvh; display: flex; flex-direction: column;
+  justify-content: center; padding: 40px 24px;
+}
+.auth-logo { text-align: center; margin-bottom: 32px; }
+.auth-logo .icon { font-size: 48px; margin-bottom: 8px; }
+.auth-logo h1 { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: -0.02em; }
+.auth-logo p { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+.auth-input {
+  width: 100%; padding: 14px 16px; font-size: 14px; background: var(--card-alt);
+  border: 2px solid var(--border); border-radius: var(--radius-sm); color: var(--text);
+  outline: none; margin-bottom: 10px;
+}
+.auth-input:focus { border-color: var(--accent); }
+.auth-input::placeholder { color: var(--text-dim); }
+.auth-link {
+  background: none; border: none; color: var(--accent); font-size: 13px;
+  font-weight: 600; cursor: pointer; margin-top: 12px; text-decoration: underline;
+}
+.auth-error {
+  color: var(--danger); font-size: 12px; margin-bottom: 10px; text-align: center;
+}
+
+/* Loading */
+.loading {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100dvh; font-size: 14px; color: var(--text-dim);
+}
+.spinner {
+  width: 32px; height: 32px; border: 3px solid var(--card-alt);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.back-btn {
+  background: none; border: none; color: var(--accent); font-size: 13px;
+  font-weight: 600; padding: 0; margin-bottom: 12px;
+}
+
+.plate-tag {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: var(--accent-soft); border-radius: var(--radius-sm); margin-bottom: 16px;
+}
+.plate-tag .plate {
+  font-size: 16px; font-weight: 800; color: var(--accent);
+  font-family: var(--mono); letter-spacing: 0.08em;
+}
+
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--text-dim);
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+.fab {
+  position: fixed; bottom: 80px; right: max(16px, calc((100vw - 430px)/2 + 16px));
+  width: 52px; height: 52px; border-radius: 50%; background: var(--accent);
+  color: #fff; border: none; font-size: 24px; box-shadow: 0 4px 16px rgba(45,106,79,0.3);
+  z-index: 90; display: flex; align-items: center; justify-content: center;
+}
+
+/* Toast */
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: #fff; padding: 12px 24px; border-radius: 12px;
+  font-size: 13px; font-weight: 600; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  animation: toastIn 0.3s ease-out;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 150;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.modal {
+  background: var(--surface); border-radius: 20px 20px 0 0; padding: 24px;
+  width: 100%; max-width: 430px; max-height: 80vh; overflow-y: auto;
+}
+.modal-handle {
+  width: 36px; height: 4px; background: var(--card-alt); border-radius: 2px;
+  margin: 0 auto 16px;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LOADING ═══════════════ -->
+<div id="loading-screen" class="loading">
+  <div style="text-align:center">
+    <div class="spinner"></div>
+    <div>Cargando Rellano...</div>
+  </div>
+</div>
+
+<!-- ═══════════════ AUTH: LOGIN ═══════════════ -->
+<div id="auth-login" class="auth-screen" style="display:none">
+  <div class="auth-logo">
+    <div class="icon">🏠</div>
+    <h1>Rellano</h1>
+    <p>Tu comunidad de vecinos en el bolsillo</p>
+  </div>
+  <input id="login-email" class="auth-input" type="email" placeholder="Email">
+  <input id="login-pass" class="auth-input" type="password" placeholder="Contraseña">
+  <div id="login-error" class="auth-error" style="display:none"></div>
+  <button id="login-btn" class="btn btn-primary" style="margin-top:6px">Entrar</button>
+  <div style="text-align:center">
+    <button id="show-register" class="auth-link">¿No tienes cuenta? Regístrate</button>
+  </div>
+</div>
+
+<!-- ═══════════════ AUTH: REGISTER ═══════════════ -->
+<div id="auth-register" class="auth-screen" style="display:none">
+  <div class="auth-logo">
+    <div class="icon">🏠</div>
+    <h1>Rellano</h1>
+    <p>Únete a tu comunidad</p>
+  </div>
+  <input id="reg-name" class="auth-input" type="text" placeholder="Tu nombre">
+  <input id="reg-email" class="auth-input" type="email" placeholder="Email">
+  <input id="reg-pass" class="auth-input" type="password" placeholder="Contraseña (mín. 6 caracteres)">
+  <input id="reg-unit" class="auth-input" type="text" placeholder="Piso/puerta (ej: 3ºB)">
+  <input id="reg-community" class="auth-input" type="text" placeholder="Código de comunidad">
+  <input id="reg-plate" class="auth-input" type="text" placeholder="Matrícula (opcional)" style="font-family:var(--mono);letter-spacing:0.08em;text-transform:uppercase">
+  <div id="reg-error" class="auth-error" style="display:none"></div>
+  <button id="reg-btn" class="btn btn-primary" style="margin-top:6px">Crear cuenta</button>
+  <div style="text-align:center">
+    <button id="show-login" class="auth-link">Ya tengo cuenta</button>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN APP ═══════════════ -->
+<div id="app-container" style="display:none">
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="home"><span class="icon">🏠</span><span class="label">Inicio</span><span class="nav-badge" id="home-badge" style="display:none">0</span></button>
+    <button class="nav-btn" data-tab="coches"><span class="icon">🚗</span><span class="label">Coches</span></button>
+    <button class="nav-btn" data-tab="tablon"><span class="icon">📋</span><span class="label">Tablón</span></button>
+    <button class="nav-btn" data-tab="reservas"><span class="icon">📅</span><span class="label">Reservas</span></button>
+    <button class="nav-btn" data-tab="mas"><span class="icon">•••</span><span class="label">Más</span></button>
+  </nav>
+
+  <!-- ══════ HOME ══════ -->
+  <div id="screen-home" class="screen active">
+    <div style="padding:24px 20px 16px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:800">R</div>
+          <h1 style="font-size:20px;font-weight:800;letter-spacing:-0.02em">Rellano</h1>
+        </div>
+        <p id="home-community-name" style="margin:4px 0 0 40px;font-size:12px;color:var(--text-dim)"></p>
+      </div>
+      <button id="home-profile-btn" style="width:38px;height:38px;border-radius:50%;border:2px solid var(--accent-soft2);background:var(--warm-soft);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--warm)"></button>
+    </div>
+    <div class="content" style="padding-top:0">
+      <div class="quick-actions">
+        <button class="quick-btn quick-btn-primary" data-nav="coches">
+          <span class="icon">🚗</span>
+          <div><div class="title">Alertar coche</div><div class="sub">Avisa a un vecino</div></div>
+        </button>
+        <button class="quick-btn quick-btn-secondary" data-nav="reservas">
+          <span class="icon">📅</span>
+          <div><div class="title">Reservar</div><div class="sub">Zonas comunes</div></div>
+        </button>
+      </div>
+      <div class="module-grid">
+        <button class="module-btn" data-nav="tablon"><span class="icon">📋</span><span class="label">Tablón</span></button>
+        <button class="module-btn" data-nav="paquetes"><span class="icon">📬</span><span class="label">Paquetes</span></button>
+        <button class="module-btn" data-nav="parking"><span class="icon">🅿️</span><span class="label">Parking</span></button>
+        <button class="module-btn" data-nav="notifs"><span class="icon">🔔</span><span class="label">Avisos</span></button>
+        <button class="module-btn" data-nav="docs"><span class="icon">📄</span><span class="label">Docs</span></button>
+        <button class="module-btn" data-nav="votar"><span class="icon">🗳️</span><span class="label">Votar</span></button>
+        <button class="module-btn" data-nav="averias"><span class="icon">🔧</span><span class="label">Averías</span></button>
+        <button class="module-btn" data-nav="contactos"><span class="icon">📞</span><span class="label">Contactos</span></button>
+      </div>
+      <h2 class="section-title">Pendiente</h2>
+      <div id="home-notifs"></div>
+      <div style="margin-top:16px">
+        <h2 class="section-title">Tu comunidad</h2>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-num" id="stat-members">-</div><div class="stat-label">Vecinos</div><div class="stat-sub">activos</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-reservas">-</div><div class="stat-label">Reservas</div><div class="stat-sub">hoy</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-paquetes">-</div><div class="stat-label">Paquetes</div><div class="stat-sub">por recoger</div></div>
+        </div>
+      </div>
+      <div style="margin-top:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h2 class="section-title" style="margin:0">Últimos del tablón</h2>
+          <button style="background:none;border:none;font-size:11px;color:var(--accent);font-weight:600" data-nav="tablon">Ver todo →</button>
+        </div>
+        <div id="home-posts"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ COCHES ══════ -->
+  <div id="screen-coches" class="screen">
+    <div class="page-header">
+      <h1 class="page-title">Coches</h1>
+      <div class="pill-group">
+        <button class="pill active" data-coches-view="report">Reportar</button>
+        <button class="pill" data-coches-view="myplates">Mis matrículas</button>
+      </div>
+    </div>
+    <div class="content">
+      <!-- Report view -->
+      <div id="coches-report">
+        <div class="progress-bar"><div class="progress-step active"></div><div class="progress-step"></div></div>
+        <div id="coches-step1">
+          <label style="font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.04em">Matrícula del vehículo</label>
+          <input id="report-plate" class="input-plate" maxlength="8" placeholder="1234 BCD" style="margin-top:8px">
+          <p style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:8px">Formato: 4 números + 3 letras</p>
+          <button id="coches-next" class="btn btn-primary" disabled style="margin-top:16px">Siguiente →</button>
+        </div>
+        <div id="coches-step2" style="display:none">
+          <div class="plate-tag">
+            <span class="plate" id="report-plate-display"></span>
+            <button id="coches-back-plate" style="margin-left:auto;background:none;border:none;color:var(--text-dim);font-size:11px;text-decoration:underline">cambiar</button>
+          </div>
+          <label style="font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.04em">¿Qué has visto?</label>
+          <div class="incident-grid" id="incident-grid"></div>
+          <textarea id="report-note" placeholder="Nota adicional (opcional)..." rows="2"
+            style="width:100%;margin-top:14px;padding:12px;font-size:13px;background:var(--card-alt);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);outline:none;resize:none"></textarea>
+          <button id="coches-send" class="btn btn-primary" disabled style="margin-top:16px">📢 Enviar aviso</button>
+        </div>
+        <div id="coches-success" class="success-screen" style="display:none">
+          <div class="success-icon">✅</div>
+          <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">¡Aviso enviado!</h2>
+          <p style="font-size:13px;color:var(--text-sec)">Si el dueño está en Rellano, recibirá la notificación.</p>
+          <p style="font-size:11px;color:var(--text-dim);margin-top:4px">Gracias por cuidar la comunidad 🙌</p>
+          <button id="coches-reset" class="btn btn-secondary" style="margin-top:20px;width:auto;padding:12px 28px;display:inline-block">Nuevo aviso</button>
+        </div>
+      </div>
+      <!-- My plates view -->
+      <div id="coches-myplates" style="display:none">
+        <div id="my-plates-list"></div>
+        <button id="add-plate-btn" style="width:100%;padding:14px;margin-top:8px;background:none;border:2px dashed var(--border);border-radius:12px;color:var(--text-dim);font-size:13px;font-weight:600">+ Añadir matrícula</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ TABLÓN ══════ -->
+  <div id="screen-tablon" class="screen">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
+      <h1 class="page-title">Tablón</h1>
+      <button id="new-post-btn" style="padding:8px 14px;background:var(--accent);border:none;border-radius:var(--radius-sm);color:#fff;font-size:12px;font-weight:600">+ Publicar</button>
+    </div>
+    <div class="content" id="tablon-list"></div>
+  </div>
+
+  <!-- ══════ RESERVAS ══════ -->
+  <div id="screen-reservas" class="screen">
+    <div class="page-header">
+      <h1 class="page-title">Reservas</h1>
+      <p class="page-subtitle">Zonas comunes de la comunidad</p>
+    </div>
+    <div class="content">
+      <div id="reservas-spaces"></div>
+      <div id="reservas-detail" style="display:none">
+        <button class="back-btn" id="reservas-back">← Volver</button>
+        <div class="day-scroll" id="reservas-days"></div>
+        <div class="slot-grid" id="reservas-slots"></div>
+        <button id="reservas-confirm" class="btn btn-primary" disabled style="margin-top:20px;display:none"></button>
+      </div>
+      <div id="reservas-success" class="success-screen" style="display:none">
+        <div class="success-icon">✅</div>
+        <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">¡Reservado!</h2>
+        <p id="reservas-success-detail" style="font-size:14px;color:var(--text-sec)"></p>
+        <button id="reservas-reset" class="btn btn-secondary" style="margin-top:20px;width:auto;padding:12px 28px;display:inline-block">Nueva reserva</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ MORE SCREENS ══════ -->
+  <div id="screen-mas" class="screen">
+    <div class="page-header"><h1 class="page-title">Más</h1></div>
+    <div class="content" id="mas-menu"></div>
+  </div>
+
+  <div id="screen-paquetes" class="screen">
+    <div class="page-header">
+      <h1 class="page-title">Paquetería</h1>
+      <p class="page-subtitle">Paquetes recibidos en conserjería</p>
+    </div>
+    <div class="content" id="paquetes-list"></div>
+  </div>
+
+  <div id="screen-parking" class="screen">
+    <div class="page-header">
+      <h1 class="page-title">Parking</h1>
+      <p class="page-subtitle">Gestión de plazas de garaje</p>
+    </div>
+    <div class="content" id="parking-content"></div>
+  </div>
+
+  <div id="screen-notifs" class="screen">
+    <div class="page-header"><h1 class="page-title">Notificaciones</h1></div>
+    <div class="content" id="notifs-list"></div>
+  </div>
+
+  <div id="screen-perfil" class="screen">
+    <div class="page-header">
+      <button class="back-btn" data-nav="mas">← Volver</button>
+    </div>
+    <div class="content" id="perfil-content"></div>
+  </div>
+
+  <!-- Placeholder screens -->
+  <div id="screen-docs" class="screen"><div class="page-header"><button class="back-btn" data-nav="mas">← Volver</button></div><div class="content"><div class="empty-state"><span class="icon">📄</span><h2 style="font-size:20px;font-weight:800;margin:16px 0 8px">Documentos</h2><p style="font-size:13px;color:var(--text-sec);line-height:1.5">Actas de juntas, estatutos, normas de régimen interno y presupuestos.</p><div style="margin-top:20px;padding:12px 20px;background:var(--accent-soft);border-radius:var(--radius-sm);display:inline-block"><span style="font-size:12px;color:var(--accent);font-weight:600">Próximamente en Rellano</span></div></div></div></div>
+  <div id="screen-votar" class="screen"><div class="page-header"><button class="back-btn" data-nav="mas">← Volver</button></div><div class="content"><div class="empty-state"><span class="icon">🗳️</span><h2 style="font-size:20px;font-weight:800;margin:16px 0 8px">Votaciones</h2><p style="font-size:13px;color:var(--text-sec);line-height:1.5">Participa en encuestas y decisiones de la comunidad sin necesidad de junta presencial.</p><div style="margin-top:20px;padding:12px 20px;background:var(--accent-soft);border-radius:var(--radius-sm);display:inline-block"><span style="font-size:12px;color:var(--accent);font-weight:600">Próximamente en Rellano</span></div></div></div></div>
+  <div id="screen-averias" class="screen"><div class="page-header"><button class="back-btn" data-nav="mas">← Volver</button></div><div class="content"><div class="empty-state"><span class="icon">🔧</span><h2 style="font-size:20px;font-weight:800;margin:16px 0 8px">Averías</h2><p style="font-size:13px;color:var(--text-sec);line-height:1.5">Reporta desperfectos en zonas comunes con fotos. Sigue el estado de la reparación.</p><div style="margin-top:20px;padding:12px 20px;background:var(--accent-soft);border-radius:var(--radius-sm);display:inline-block"><span style="font-size:12px;color:var(--accent);font-weight:600">Próximamente en Rellano</span></div></div></div></div>
+  <div id="screen-contactos" class="screen"><div class="page-header"><button class="back-btn" data-nav="mas">← Volver</button></div><div class="content"><div class="empty-state"><span class="icon">📞</span><h2 style="font-size:20px;font-weight:800;margin:16px 0 8px">Contactos</h2><p style="font-size:13px;color:var(--text-sec);line-height:1.5">Directorio de vecinos, administrador, conserje y servicios profesionales.</p><div style="margin-top:20px;padding:12px 20px;background:var(--accent-soft);border-radius:var(--radius-sm);display:inline-block"><span style="font-size:12px;color:var(--accent);font-weight:600">Próximamente en Rellano</span></div></div></div></div>
+  <div id="screen-cuotas" class="screen"><div class="page-header"><button class="back-btn" data-nav="mas">← Volver</button></div><div class="content"><div class="empty-state"><span class="icon">💰</span><h2 style="font-size:20px;font-weight:800;margin:16px 0 8px">Cuotas</h2><p style="font-size:13px;color:var(--text-sec);line-height:1.5">Consulta tus recibos, derramas y pagos. Paga cómodamente desde la app.</p><div style="margin-top:20px;padding:12px 20px;background:var(--accent-soft);border-radius:var(--radius-sm);display:inline-block"><span style="font-size:12px;color:var(--accent);font-weight:600">Próximamente en Rellano</span></div></div></div></div>
+</div>
+
+<!-- ══════ NEW POST MODAL ══════ -->
+<div id="post-modal" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 style="font-size:18px;font-weight:800;margin-bottom:16px">Nueva publicación</h2>
+    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="pill active" data-post-tag="pregunta">❓ Pregunta</button>
+      <button class="pill" data-post-tag="aviso">📢 Aviso</button>
+      <button class="pill" data-post-tag="encontrado">🔍 Encontrado</button>
+      <button class="pill" data-post-tag="venta">🏷️ Venta</button>
+    </div>
+    <textarea id="post-text" placeholder="¿Qué quieres compartir con tus vecinos?" rows="4"
+      style="width:100%;padding:12px;font-size:14px;background:var(--card-alt);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);outline:none;resize:none"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button id="post-cancel" class="btn btn-secondary" style="flex:1">Cancelar</button>
+      <button id="post-submit" class="btn btn-primary" style="flex:1">Publicar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ ADD PLATE MODAL ══════ -->
+<div id="plate-modal" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 style="font-size:18px;font-weight:800;margin-bottom:16px">Añadir matrícula</h2>
+    <input id="new-plate-input" class="input-plate" maxlength="8" placeholder="1234 BCD">
+    <input id="new-plate-spot" class="auth-input" type="text" placeholder="Nº de plaza (opcional)" style="margin-top:10px">
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button id="plate-cancel" class="btn btn-secondary" style="flex:1">Cancelar</button>
+      <button id="plate-submit" class="btn btn-primary" style="flex:1">Añadir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FIREBASE + APP LOGIC ═══════════════ -->
+<script type="module">
+  // ─── Firebase SDK ───
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, query, where, orderBy, limit, onSnapshot, serverTimestamp, Timestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ╔═══════════════════════════════════════════════════╗
+  // ║  🔧 CONFIGURA TU PROYECTO FIREBASE AQUÍ ABAJO 🔧  ║
+  // ╚═══════════════════════════════════════════════════╝
+  const firebaseConfig = {
+    apiKey: "AIzaSyBlO_Mq69Qr2oXzZR6CVibQ44S2YRcv4WM",
+    authDomain: "rellano-649e7.firebaseapp.com",
+    projectId: "rellano-649e7",
+    storageBucket: "rellano-649e7.firebasestorage.app",
+    messagingSenderId: "1020270199308",
+    appId: "1:1020270199308:web:65b6b4e3d7c45a48caa429"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // ─── State ───
+  let currentUser = null;
+  let userData = null;
+  let communityData = null;
+  let currentTab = 'home';
+  let unsubscribers = [];
+
+  // ─── Incident types ───
+  const INCIDENTS = [
+    { id: 'luces', icon: '💡', label: 'Luces encendidas' },
+    { id: 'rueda', icon: '🛞', label: 'Rueda pinchada' },
+    { id: 'maletero', icon: '📦', label: 'Maletero abierto' },
+    { id: 'ventana', icon: '🪟', label: 'Ventanilla abierta' },
+    { id: 'golpe', icon: '💥', label: 'Golpe / Roce' },
+    { id: 'grua', icon: '🚨', label: 'Grúa en la zona' },
+    { id: 'alarma', icon: '🔊', label: 'Alarma sonando' },
+    { id: 'otro', icon: '⚠️', label: 'Otra incidencia' },
+  ];
+
+  const SPACES = [
+    { id: 'padel', name: 'Pista de Pádel', icon: '🎾', slots: ['09:00','10:30','12:00','17:00','18:30','20:00'] },
+    { id: 'piscina', name: 'Piscina', icon: '🏊', slots: ['10:00','11:30','13:00','16:00','17:30','19:00'] },
+    { id: 'salon', name: 'Salón Social', icon: '🎉', slots: ['10:00','14:00','18:00'] },
+    { id: 'gym', name: 'Gimnasio', icon: '🏋️', slots: ['07:00','08:30','10:00','17:00','18:30','20:00'] },
+  ];
+
+  // ─── Helpers ───
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => document.querySelectorAll(s);
+  const show = (el) => { if (typeof el === 'string') el = $(el); if (el) el.style.display = ''; };
+  const hide = (el) => { if (typeof el === 'string') el = $(el); if (el) el.style.display = 'none'; };
+
+  function formatPlate(v) {
+    const c = v.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 7);
+    return c.length <= 4 ? c : c.slice(0, 4) + ' ' + c.slice(4);
+  }
+
+  function timeAgo(ts) {
+    if (!ts) return '';
+    const now = Date.now();
+    const t = ts.toDate ? ts.toDate().getTime() : ts;
+    const diff = Math.floor((now - t) / 1000);
+    if (diff < 60) return 'Ahora';
+    if (diff < 3600) return `Hace ${Math.floor(diff/60)} min`;
+    if (diff < 86400) return `Hace ${Math.floor(diff/3600)}h`;
+    if (diff < 172800) return 'Ayer';
+    return `Hace ${Math.floor(diff/86400)} días`;
+  }
+
+  function toast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  // ─── Navigation ───
+  function navigate(tab) {
+    currentTab = tab;
+    $$('.screen').forEach(s => s.classList.remove('active'));
+    const screen = $(`#screen-${tab}`);
+    if (screen) screen.classList.add('active');
+    $$('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    // Load data for screen
+    if (tab === 'home') loadHome();
+    if (tab === 'tablon') loadTablon();
+    if (tab === 'coches') initCoches();
+    if (tab === 'reservas') loadReservas();
+    if (tab === 'paquetes') loadPaquetes();
+    if (tab === 'parking') loadParking();
+    if (tab === 'notifs') loadNotifs();
+    if (tab === 'mas') loadMas();
+    if (tab === 'perfil') loadPerfil();
+  }
+
+  // Event delegation for nav
+  document.addEventListener('click', (e) => {
+    const navBtn = e.target.closest('.nav-btn');
+    if (navBtn) { navigate(navBtn.dataset.tab); return; }
+    const navLink = e.target.closest('[data-nav]');
+    if (navLink) { navigate(navLink.dataset.nav); return; }
+  });
+
+  // ─── Auth Flow ───
+  onAuthStateChanged(auth, async (user) => {
+    hide('#loading-screen');
+    if (user) {
+      currentUser = user;
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) {
+        userData = snap.data();
+        const cSnap = await getDoc(doc(db, 'communities', userData.communityId));
+        communityData = cSnap.exists() ? cSnap.data() : { name: 'Mi Comunidad' };
+      } else {
+        userData = { name: user.email.split('@')[0], communityId: 'default' };
+        communityData = { name: 'Mi Comunidad' };
+      }
+      hide('#auth-login'); hide('#auth-register');
+      show('#app-container');
+      navigate('home');
+    } else {
+      currentUser = null; userData = null;
+      hide('#app-container');
+      show('#auth-login');
+    }
+  });
+
+  // Login
+  $('#login-btn').addEventListener('click', async () => {
+    const email = $('#login-email').value.trim();
+    const pass = $('#login-pass').value;
+    hide('#login-error');
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch (e) {
+      $('#login-error').textContent = 'Email o contraseña incorrectos';
+      show('#login-error');
+    }
+  });
+
+  // Register
+  $('#reg-btn').addEventListener('click', async () => {
+    const name = $('#reg-name').value.trim();
+    const email = $('#reg-email').value.trim();
+    const pass = $('#reg-pass').value;
+    const unit = $('#reg-unit').value.trim();
+    const communityCode = $('#reg-community').value.trim();
+    const plate = formatPlate($('#reg-plate').value);
+    hide('#reg-error');
+
+    if (!name || !email || !pass || !unit || !communityCode) {
+      $('#reg-error').textContent = 'Rellena todos los campos obligatorios';
+      show('#reg-error'); return;
+    }
+
+    try {
+      // Find community by code
+      const cQuery = query(collection(db, 'communities'), where('code', '==', communityCode.toUpperCase()));
+      const cSnap = await getDocs(cQuery);
+      let communityId;
+
+      if (cSnap.empty) {
+        // Create community if code doesn't exist (first user becomes admin)
+        const cRef = await addDoc(collection(db, 'communities'), {
+          name: 'Mi Comunidad',
+          code: communityCode.toUpperCase(),
+          createdAt: serverTimestamp()
+        });
+        communityId = cRef.id;
+      } else {
+        communityId = cSnap.docs[0].id;
+      }
+
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+
+      await setDoc(doc(db, 'users', cred.user.uid), {
+        name, email, unit, communityId,
+        role: cSnap.empty ? 'admin' : 'member',
+        createdAt: serverTimestamp()
+      });
+
+      // Add plate if provided
+      if (plate.length >= 7) {
+        await addDoc(collection(db, 'communities', communityId, 'plates'), {
+          plate, userId: cred.user.uid, spot: '', createdAt: serverTimestamp()
+        });
+      }
+
+    } catch (e) {
+      $('#reg-error').textContent = e.code === 'auth/email-already-in-use' ? 'Ese email ya está registrado' : e.message;
+      show('#reg-error');
+    }
+  });
+
+  $('#show-register').addEventListener('click', () => { hide('#auth-login'); show('#auth-register'); });
+  $('#show-login').addEventListener('click', () => { hide('#auth-register'); show('#auth-login'); });
+
+  // ─── HOME ───
+  async function loadHome() {
+    $('#home-community-name').textContent = communityData?.name || '';
+    const btn = $('#home-profile-btn');
+    btn.textContent = (userData?.name || '?')[0].toUpperCase();
+    btn.onclick = () => navigate('perfil');
+
+    // Unread notifications
+    if (userData?.communityId) {
+      try {
+        const nQ = query(
+          collection(db, 'communities', userData.communityId, 'notifications'),
+          where('userId', '==', currentUser.uid),
+          where('read', '==', false),
+          orderBy('createdAt', 'desc'), limit(5)
+        );
+        const nSnap = await getDocs(nQ);
+        const container = $('#home-notifs');
+        container.innerHTML = '';
+        const badge = $('#home-badge');
+        if (nSnap.size > 0) {
+          badge.textContent = nSnap.size;
+          show(badge);
+        } else {
+          hide(badge);
+        }
+        nSnap.forEach(d => {
+          const n = d.data();
+          container.innerHTML += `
+            <div class="card" style="padding:12px;cursor:pointer" data-nav="notifs">
+              <div style="display:flex;gap:10px;align-items:center">
+                <span style="font-size:20px">${n.icon || '🔔'}</span>
+                <div style="flex:1">
+                  <div style="display:flex;justify-content:space-between">
+                    <span style="font-size:13px;font-weight:700">${n.title || ''}</span>
+                    <span style="font-size:10px;color:var(--text-dim)">${timeAgo(n.createdAt)}</span>
+                  </div>
+                  <span style="font-size:11px;color:var(--text-sec)">${n.desc || ''}</span>
+                </div>
+              </div>
+            </div>`;
+        });
+        if (nSnap.empty) {
+          container.innerHTML = '<p style="font-size:12px;color:var(--text-dim)">Todo al día 👌</p>';
+        }
+      } catch(e) {
+        console.log('Notifs query needs index:', e);
+        $('#home-notifs').innerHTML = '<p style="font-size:12px;color:var(--text-dim)">Todo al día 👌</p>';
+        hide('#home-badge');
+      }
+
+      // Stats
+      try {
+        const membersSnap = await getDocs(query(collection(db, 'users'), where('communityId', '==', userData.communityId)));
+        $('#stat-members').textContent = membersSnap.size;
+      } catch(e) { $('#stat-members').textContent = '-'; }
+
+      // Recent posts
+      try {
+        const pQ = query(
+          collection(db, 'communities', userData.communityId, 'posts'),
+          orderBy('createdAt', 'desc'), limit(2)
+        );
+        const pSnap = await getDocs(pQ);
+        const container = $('#home-posts');
+        container.innerHTML = '';
+        pSnap.forEach(d => {
+          const p = d.data();
+          const initial = (p.authorName || '?')[0].toUpperCase();
+          const isAdmin = p.authorRole === 'admin';
+          container.innerHTML += `
+            <div class="card" style="padding:12px">
+              <div style="display:flex;gap:8px;align-items:flex-start">
+                <div class="post-avatar ${isAdmin ? 'admin' : 'user'}">${initial}</div>
+                <div style="flex:1">
+                  <div style="display:flex;justify-content:space-between;align-items:center">
+                    <span style="font-size:11px;font-weight:700">${p.authorName || ''} — ${p.authorUnit || ''}</span>
+                    <span style="font-size:9px;color:var(--text-dim)">${timeAgo(p.createdAt)}</span>
+                  </div>
+                  <p style="margin:4px 0 0;font-size:12px;color:var(--text-sec);line-height:1.4">${(p.text||'').slice(0,80)}${(p.text||'').length > 80 ? '...' : ''}</p>
+                </div>
+              </div>
+            </div>`;
+        });
+        if (pSnap.empty) container.innerHTML = '<p style="font-size:12px;color:var(--text-dim)">Aún no hay publicaciones</p>';
+      } catch(e) {
+        $('#home-posts').innerHTML = '<p style="font-size:12px;color:var(--text-dim)">Aún no hay publicaciones</p>';
+      }
+    }
+    $('#stat-reservas').textContent = '-';
+    $('#stat-paquetes').textContent = '-';
+  }
+
+  // ─── COCHES ───
+  let reportState = { plate: '', incident: null, step: 1 };
+
+  function initCoches() {
+    // Build incident grid
+    const grid = $('#incident-grid');
+    if (!grid.children.length) {
+      grid.innerHTML = INCIDENTS.map(inc => `
+        <button class="incident-btn" data-incident="${inc.id}">
+          <span class="icon">${inc.icon}</span>
+          <span class="text">${inc.label}</span>
+        </button>`).join('');
+    }
+    showCochesStep(1);
+    loadMyPlates();
+  }
+
+  function showCochesStep(step) {
+    reportState.step = step;
+    $$('.progress-step').forEach((s, i) => s.classList.toggle('active', i < step));
+    hide('#coches-step1'); hide('#coches-step2'); hide('#coches-success');
+    if (step === 1) show('#coches-step1');
+    if (step === 2) {
+      show('#coches-step2');
+      $('#report-plate-display').textContent = reportState.plate;
+    }
+    if (step === 3) show('#coches-success');
+  }
+
+  // Plate input
+  $('#report-plate').addEventListener('input', (e) => {
+    e.target.value = formatPlate(e.target.value);
+    reportState.plate = e.target.value;
+    const valid = e.target.value.replace(/\s/g, '').length >= 7;
+    e.target.classList.toggle('valid', valid);
+    $('#coches-next').disabled = !valid;
+  });
+
+  $('#coches-next').addEventListener('click', () => showCochesStep(2));
+  $('#coches-back-plate').addEventListener('click', () => showCochesStep(1));
+
+  // Incident selection
+  $('#incident-grid').addEventListener('click', (e) => {
+    const btn = e.target.closest('.incident-btn');
+    if (!btn) return;
+    $$('.incident-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    reportState.incident = btn.dataset.incident;
+    $('#coches-send').disabled = false;
+  });
+
+  // Send report
+  $('#coches-send').addEventListener('click', async () => {
+    if (!reportState.incident || !userData?.communityId) return;
+    const inc = INCIDENTS.find(i => i.id === reportState.incident);
+    try {
+      // Find plate owner in community
+      const pQ = query(
+        collection(db, 'communities', userData.communityId, 'plates'),
+        where('plate', '==', reportState.plate)
+      );
+      const pSnap = await getDocs(pQ);
+
+      // Save alert
+      await addDoc(collection(db, 'communities', userData.communityId, 'alerts'), {
+        plate: reportState.plate,
+        type: reportState.incident,
+        note: $('#report-note').value.trim(),
+        reporterId: currentUser.uid,
+        reporterName: userData.name,
+        createdAt: serverTimestamp()
+      });
+
+      // Create notification for plate owner
+      if (!pSnap.empty) {
+        const plateOwner = pSnap.docs[0].data().userId;
+        if (plateOwner !== currentUser.uid) {
+          await addDoc(collection(db, 'communities', userData.communityId, 'notifications'), {
+            userId: plateOwner,
+            type: 'coche',
+            icon: inc.icon,
+            title: inc.label,
+            desc: `Tu coche ${reportState.plate}`,
+            read: false,
+            createdAt: serverTimestamp()
+          });
+        }
+      }
+
+      showCochesStep(3);
+    } catch (e) {
+      toast('Error al enviar el aviso');
+      console.error(e);
+    }
+  });
+
+  $('#coches-reset').addEventListener('click', () => {
+    reportState = { plate: '', incident: null, step: 1 };
+    $('#report-plate').value = '';
+    $('#report-note').value = '';
+    $$('.incident-btn').forEach(b => b.classList.remove('selected'));
+    $('#coches-send').disabled = true;
+    $('#coches-next').disabled = true;
+    showCochesStep(1);
+  });
+
+  // Coches view toggle
+  $$('[data-coches-view]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const view = btn.dataset.cochesView;
+      $$('[data-coches-view]').forEach(b => b.classList.toggle('active', b.dataset.cochesView === view));
+      if (view === 'report') { show('#coches-report'); hide('#coches-myplates'); }
+      else { hide('#coches-report'); show('#coches-myplates'); loadMyPlates(); }
+    });
+  });
+
+  async function loadMyPlates() {
+    if (!userData?.communityId) return;
+    try {
+      const q2 = query(
+        collection(db, 'communities', userData.communityId, 'plates'),
+        where('userId', '==', currentUser.uid)
+      );
+      const snap = await getDocs(q2);
+      const container = $('#my-plates-list');
+      container.innerHTML = '';
+      snap.forEach(d => {
+        const p = d.data();
+        container.innerHTML += `
+          <div class="card" style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:20px">🚗</span>
+            <span style="font-size:18px;font-weight:800;font-family:var(--mono);letter-spacing:0.06em">${p.plate}</span>
+            ${p.spot ? `<span class="badge badge-accent">Plaza ${p.spot}</span>` : ''}
+            <button onclick="deletePlate('${d.id}')" style="margin-left:auto;background:var(--danger-soft);border:none;border-radius:8px;padding:6px 10px;color:var(--danger);font-size:11px;font-weight:600">Eliminar</button>
+          </div>`;
+      });
+      if (snap.empty) {
+        container.innerHTML = '<p style="font-size:12px;color:var(--text-dim);text-align:center;padding:20px">Aún no has registrado ninguna matrícula</p>';
+      }
+    } catch(e) { console.error(e); }
+  }
+
+  // Add plate modal
+  $('#add-plate-btn').addEventListener('click', () => show('#plate-modal'));
+  $('#plate-cancel').addEventListener('click', () => hide('#plate-modal'));
+  $('#new-plate-input').addEventListener('input', (e) => { e.target.value = formatPlate(e.target.value); });
+  $('#plate-submit').addEventListener('click', async () => {
+    const plate = formatPlate($('#new-plate-input').value);
+    const spot = $('#new-plate-spot').value.trim();
+    if (plate.replace(/\s/g, '').length < 7) { toast('Matrícula no válida'); return; }
+    try {
+      await addDoc(collection(db, 'communities', userData.communityId, 'plates'), {
+        plate, spot, userId: currentUser.uid, createdAt: serverTimestamp()
+      });
+      hide('#plate-modal');
+      $('#new-plate-input').value = '';
+      $('#new-plate-spot').value = '';
+      loadMyPlates();
+      toast('Matrícula añadida');
+    } catch(e) { toast('Error al añadir'); }
+  });
+
+  window.deletePlate = async (id) => {
+    if (!confirm('¿Eliminar esta matrícula?')) return;
+    try {
+      await deleteDoc(doc(db, 'communities', userData.communityId, 'plates', id));
+      loadMyPlates();
+      toast('Matrícula eliminada');
+    } catch(e) { toast('Error'); }
+  };
+
+  // ─── TABLÓN ───
+  async function loadTablon() {
+    if (!userData?.communityId) return;
+    try {
+      const q2 = query(
+        collection(db, 'communities', userData.communityId, 'posts'),
+        orderBy('createdAt', 'desc'), limit(20)
+      );
+      const snap = await getDocs(q2);
+      const container = $('#tablon-list');
+      container.innerHTML = '';
+      const tagColors = { aviso: 'danger', pregunta: 'info', encontrado: 'accent', venta: 'orange' };
+      const tagLabels = { aviso: 'Aviso', pregunta: 'Pregunta', encontrado: 'Encontrado', venta: 'Venta' };
+
+      snap.forEach(d => {
+        const p = d.data();
+        const initial = (p.authorName || '?')[0].toUpperCase();
+        const isAdmin = p.authorRole === 'admin';
+        container.innerHTML += `
+          <div class="card post-card">
+            ${p.pinned ? '<div style="position:absolute;top:10px;right:12px;font-size:12px">📌</div>' : ''}
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <div class="post-avatar ${isAdmin ? 'admin' : 'user'}">${initial}</div>
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                  <span style="font-size:13px;font-weight:700">${p.authorName || ''} — ${p.authorUnit || ''}</span>
+                  <span class="badge badge-${tagColors[p.tag] || 'accent'}">${tagLabels[p.tag] || p.tag || ''}</span>
+                </div>
+                <span style="font-size:10px;color:var(--text-dim)">${timeAgo(p.createdAt)}</span>
+                <p style="margin:8px 0 0;font-size:13px;color:var(--text-sec);line-height:1.5">${p.text || ''}</p>
+                <div style="display:flex;gap:16px;margin-top:10px">
+                  <span style="font-size:12px;color:var(--text-dim)">🤍 ${p.likes || 0}</span>
+                  <span style="font-size:12px;color:var(--text-dim)">💬 ${p.comments || 0}</span>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      });
+      if (snap.empty) {
+        container.innerHTML = '<div class="empty-state"><span class="icon">📋</span><p>Aún no hay publicaciones. ¡Sé el primero!</p></div>';
+      }
+    } catch(e) {
+      console.error(e);
+      $('#tablon-list').innerHTML = '<p style="font-size:12px;color:var(--text-dim)">Error cargando el tablón</p>';
+    }
+  }
+
+  // New post
+  let postTag = 'pregunta';
+  $$('[data-post-tag]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      postTag = btn.dataset.postTag;
+      $$('[data-post-tag]').forEach(b => b.classList.toggle('active', b.dataset.postTag === postTag));
+    });
+  });
+
+  $('#new-post-btn').addEventListener('click', () => show('#post-modal'));
+  $('#post-cancel').addEventListener('click', () => { hide('#post-modal'); $('#post-text').value = ''; });
+  $('#post-submit').addEventListener('click', async () => {
+    const text = $('#post-text').value.trim();
+    if (!text) return;
+    try {
+      await addDoc(collection(db, 'communities', userData.communityId, 'posts'), {
+        text, tag: postTag,
+        authorId: currentUser.uid,
+        authorName: userData.name,
+        authorUnit: userData.unit || '',
+        authorRole: userData.role || 'member',
+        likes: 0, comments: 0, pinned: false,
+        createdAt: serverTimestamp()
+      });
+      hide('#post-modal');
+      $('#post-text').value = '';
+      loadTablon();
+      toast('Publicado en el tablón');
+    } catch(e) { toast('Error al publicar'); }
+  });
+
+  // ─── RESERVAS ───
+  let reservaState = { space: null, day: 0, slot: null };
+  const dayNames = ['Hoy', 'Mañana'];
+  const weekDays = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  for (let i = 2; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() + i);
+    dayNames.push(`${weekDays[d.getDay()]} ${d.getDate()}`);
+  }
+
+  function loadReservas() {
+    show('#reservas-spaces'); hide('#reservas-detail'); hide('#reservas-success');
+    const container = $('#reservas-spaces');
+    container.innerHTML = SPACES.map(sp => `
+      <div class="card space-card" data-space="${sp.id}">
+        <div class="space-icon">${sp.icon}</div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:700">${sp.name}</div>
+          <div style="font-size:11px;color:var(--text-dim)">${sp.slots.length} franjas disponibles</div>
+        </div>
+        <span style="font-size:16px;color:var(--text-dim)">›</span>
+      </div>`).join('');
+
+    container.querySelectorAll('[data-space]').forEach(card => {
+      card.addEventListener('click', () => {
+        reservaState.space = card.dataset.space;
+        reservaState.day = 0;
+        reservaState.slot = null;
+        hide('#reservas-spaces');
+        show('#reservas-detail');
+        renderReservaDetail();
+      });
+    });
+  }
+
+  async function renderReservaDetail() {
+    const sp = SPACES.find(s => s.id === reservaState.space);
+    // Days
+    $('#reservas-days').innerHTML = dayNames.map((d, i) => `
+      <button class="day-btn ${i === reservaState.day ? 'active' : ''}" data-day="${i}">${d}</button>`).join('');
+    $$('#reservas-days .day-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        reservaState.day = parseInt(btn.dataset.day);
+        reservaState.slot = null;
+        renderReservaDetail();
+      });
+    });
+
+    // Get taken slots from DB
+    let takenSlots = [];
+    if (userData?.communityId) {
+      try {
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + reservaState.day);
+        const dateStr = targetDate.toISOString().split('T')[0];
+        const rQ = query(
+          collection(db, 'communities', userData.communityId, 'reservations'),
+          where('spaceId', '==', reservaState.space),
+          where('date', '==', dateStr)
+        );
+        const rSnap = await getDocs(rQ);
+        rSnap.forEach(d => takenSlots.push(d.data().slot));
+      } catch(e) { console.log(e); }
+    }
+
+    // Slots
+    $('#reservas-slots').innerHTML = sp.slots.map(slot => {
+      const taken = takenSlots.includes(slot);
+      const selected = reservaState.slot === slot;
+      return `
+        <button class="slot-btn ${taken ? 'taken' : ''} ${selected ? 'selected' : ''}" data-slot="${slot}" ${taken ? 'disabled' : ''}>
+          <div class="slot-time" style="color:${taken ? 'var(--text-dim)' : 'var(--text)'}">${slot}</div>
+          <div class="slot-status" style="color:${taken ? 'var(--text-dim)' : 'var(--accent)'}">${taken ? 'Ocupado' : 'Libre'}</div>
+        </button>`;
+    }).join('');
+
+    $$('#reservas-slots .slot-btn:not(.taken)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        reservaState.slot = btn.dataset.slot;
+        renderReservaDetail();
+      });
+    });
+
+    // Confirm button
+    const confirmBtn = $('#reservas-confirm');
+    if (reservaState.slot) {
+      confirmBtn.textContent = `Confirmar reserva — ${reservaState.slot}`;
+      confirmBtn.disabled = false;
+      show(confirmBtn);
+    } else {
+      hide(confirmBtn);
+    }
+  }
+
+  $('#reservas-confirm').addEventListener('click', async () => {
+    const sp = SPACES.find(s => s.id === reservaState.space);
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + reservaState.day);
+    const dateStr = targetDate.toISOString().split('T')[0];
+
+    try {
+      await addDoc(collection(db, 'communities', userData.communityId, 'reservations'), {
+        spaceId: reservaState.space,
+        spaceName: sp.name,
+        date: dateStr,
+        slot: reservaState.slot,
+        userId: currentUser.uid,
+        userName: userData.name,
+        userUnit: userData.unit || '',
+        createdAt: serverTimestamp()
+      });
+      hide('#reservas-detail');
+      $('#reservas-success-detail').textContent = `${sp.icon} ${sp.name} — ${dayNames[reservaState.day]} ${reservaState.slot}`;
+      show('#reservas-success');
+      toast('Reserva confirmada');
+    } catch(e) { toast('Error al reservar'); }
+  });
+
+  $('#reservas-back').addEventListener('click', () => { hide('#reservas-detail'); show('#reservas-spaces'); });
+  $('#reservas-reset').addEventListener('click', () => loadReservas());
+
+  // ─── PAQUETES ───
+  async function loadPaquetes() {
+    if (!userData?.communityId) return;
+    try {
+      const q2 = query(
+        collection(db, 'communities', userData.communityId, 'packages'),
+        where('userId', '==', currentUser.uid),
+        orderBy('createdAt', 'desc'), limit(20)
+      );
+      const snap = await getDocs(q2);
+      const container = $('#paquetes-list');
+      container.innerHTML = '';
+      const statusLabel = { pending: 'Por recoger', picked: 'Recogido' };
+      const statusBadge = { pending: 'badge-orange', picked: 'badge-accent' };
+
+      snap.forEach(d => {
+        const p = d.data();
+        container.innerHTML += `
+          <div class="card" style="display:flex;align-items:center;gap:12px">
+            <div style="width:44px;height:44px;border-radius:12px;background:${p.status === 'pending' ? 'var(--orange-soft)' : 'var(--accent-soft)'};display:flex;align-items:center;justify-content:center;font-size:20px">${p.status === 'pending' ? '📬' : '📦'}</div>
+            <div style="flex:1">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:14px;font-weight:700">${p.carrier || ''}</span>
+                <span class="badge ${statusBadge[p.status] || 'badge-accent'}">${statusLabel[p.status] || p.status}</span>
+              </div>
+              <div style="font-size:12px;color:var(--text-sec);margin-top:2px">${p.desc || ''}</div>
+              <div style="display:flex;justify-content:space-between;margin-top:4px">
+                <span style="font-size:10px;color:var(--text-dim);font-family:var(--mono)">${p.code || ''}</span>
+                <span style="font-size:10px;color:var(--text-dim)">${timeAgo(p.createdAt)}</span>
+              </div>
+            </div>
+          </div>`;
+      });
+      if (snap.empty) {
+        container.innerHTML = '<div class="empty-state"><span class="icon">📬</span><p style="margin-top:12px;font-size:13px">No hay paquetes registrados</p></div>';
+      }
+    } catch(e) {
+      console.error(e);
+      $('#paquetes-list').innerHTML = '<div class="empty-state"><span class="icon">📬</span><p style="margin-top:12px;font-size:13px">No hay paquetes registrados</p></div>';
+    }
+  }
+
+  // ─── PARKING ───
+  async function loadParking() {
+    if (!userData?.communityId) return;
+    const container = $('#parking-content');
+    container.innerHTML = '<h2 class="section-title">Mis plazas</h2><div id="my-parking"></div><div style="margin-top:20px"><h2 class="section-title">Plazas disponibles de vecinos</h2><div id="available-parking"></div></div>';
+
+    try {
+      // My plates/spots
+      const myQ = query(
+        collection(db, 'communities', userData.communityId, 'plates'),
+        where('userId', '==', currentUser.uid)
+      );
+      const mySnap = await getDocs(myQ);
+      const myDiv = container.querySelector('#my-parking');
+      myDiv.innerHTML = '';
+      mySnap.forEach(d => {
+        const p = d.data();
+        myDiv.innerHTML += `
+          <div class="card" style="display:flex;align-items:center;gap:12px">
+            <div style="width:44px;height:44px;border-radius:12px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--accent)">${p.spot || '—'}</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:700;font-family:var(--mono);letter-spacing:0.04em">${p.plate}</div>
+              <div style="font-size:11px;color:var(--text-dim)">${p.spot ? 'Plaza ' + p.spot : 'Sin plaza asignada'}</div>
+            </div>
+            <span class="badge badge-accent">Ocupada</span>
+          </div>`;
+      });
+      if (mySnap.empty) myDiv.innerHTML = '<p style="font-size:12px;color:var(--text-dim)">No tienes plazas registradas</p>';
+
+      // Available spots
+      const avQ = query(
+        collection(db, 'communities', userData.communityId, 'available_spots'),
+        orderBy('createdAt', 'desc')
+      );
+      const avSnap = await getDocs(avQ);
+      const avDiv = container.querySelector('#available-parking');
+      avDiv.innerHTML = '';
+      avSnap.forEach(d => {
+        const s = d.data();
+        avDiv.innerHTML += `
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:44px;height:44px;border-radius:12px;background:var(--warm-soft);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--warm)">${s.spot || '?'}</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:700">${s.ownerName || ''} — ${s.ownerUnit || ''}</div>
+                <div style="font-size:11px;color:var(--text-sec);margin-top:2px">${s.note || ''}</div>
+              </div>
+            </div>
+            <button style="width:100%;margin-top:10px;padding:10px;background:var(--card-alt);border:none;border-radius:8px;font-size:12px;font-weight:600;color:var(--accent)">Contactar</button>
+          </div>`;
+      });
+      if (avSnap.empty) avDiv.innerHTML = '<p style="font-size:12px;color:var(--text-dim)">No hay plazas disponibles ahora mismo</p>';
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  // ─── NOTIFICACIONES ───
+  async function loadNotifs() {
+    if (!userData?.communityId) return;
+    try {
+      const q2 = query(
+        collection(db, 'communities', userData.communityId, 'notifications'),
+        where('userId', '==', currentUser.uid),
+        orderBy('createdAt', 'desc'), limit(30)
+      );
+      const snap = await getDocs(q2);
+      const container = $('#notifs-list');
+      container.innerHTML = '';
+      snap.forEach(d => {
+        const n = d.data();
+        container.innerHTML += `
+          <div class="notif-item ${n.read ? '' : 'unread'}" data-notif-id="${d.id}">
+            <span style="font-size:20px">${n.icon || '🔔'}</span>
+            <div style="flex:1">
+              <div style="display:flex;justify-content:space-between">
+                <span style="font-size:13px;font-weight:${n.read ? '500' : '700'}">${n.title || ''}</span>
+                <span style="font-size:10px;color:var(--text-dim)">${timeAgo(n.createdAt)}</span>
+              </div>
+              <span style="font-size:11px;color:var(--text-sec)">${n.desc || ''}</span>
+            </div>
+          </div>`;
+      });
+      if (snap.empty) {
+        container.innerHTML = '<div class="empty-state"><span class="icon">🔔</span><p style="margin-top:12px;font-size:13px">No hay notificaciones</p></div>';
+      }
+
+      // Mark as read on click
+      container.querySelectorAll('.notif-item.unread').forEach(item => {
+        item.addEventListener('click', async () => {
+          try {
+            await updateDoc(doc(db, 'communities', userData.communityId, 'notifications', item.dataset.notifId), { read: true });
+            item.classList.remove('unread');
+          } catch(e) {}
+        });
+      });
+    } catch(e) {
+      console.error(e);
+      $('#notifs-list').innerHTML = '<div class="empty-state"><span class="icon">🔔</span><p style="margin-top:12px;font-size:13px">No hay notificaciones</p></div>';
+    }
+  }
+
+  // ─── MÁS ───
+  function loadMas() {
+    const items = [
+      { icon: '📬', label: 'Paquetería', desc: 'Recogida de paquetes', tab: 'paquetes' },
+      { icon: '🅿️', label: 'Parking', desc: 'Plazas y alquiler', tab: 'parking' },
+      { icon: '🔔', label: 'Notificaciones', desc: 'Todos los avisos', tab: 'notifs' },
+      { icon: '📄', label: 'Documentos', desc: 'Actas, estatutos, normas', tab: 'docs' },
+      { icon: '🗳️', label: 'Votaciones', desc: 'Encuestas y juntas', tab: 'votar' },
+      { icon: '🔧', label: 'Averías', desc: 'Reportar desperfectos', tab: 'averias' },
+      { icon: '📞', label: 'Contactos', desc: 'Directorio y servicios', tab: 'contactos' },
+      { icon: '💰', label: 'Cuotas', desc: 'Recibos y pagos', tab: 'cuotas' },
+      { icon: '👤', label: 'Mi perfil', desc: 'Datos y ajustes', tab: 'perfil' },
+    ];
+    $('#mas-menu').innerHTML = items.map(it => `
+      <div class="menu-item" data-nav="${it.tab}">
+        <div class="menu-icon">${it.icon}</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:600">${it.label}</div>
+          <div style="font-size:11px;color:var(--text-dim)">${it.desc}</div>
+        </div>
+        <span style="color:var(--text-dim)">›</span>
+      </div>`).join('');
+  }
+
+  // ─── PERFIL ───
+  function loadPerfil() {
+    const container = $('#perfil-content');
+    const initial = (userData?.name || '?')[0].toUpperCase();
+    container.innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-light));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff">${initial}</div>
+        <div>
+          <div style="font-size:18px;font-weight:700">${userData?.name || ''}</div>
+          <div style="font-size:12px;color:var(--text-dim)">${userData?.unit || ''} · ${communityData?.name || ''}</div>
+          <div style="font-size:11px;color:var(--text-dim)">${userData?.email || ''}</div>
+        </div>
+      </div>
+      <h2 class="section-title">Comunidad</h2>
+      <div class="card" style="margin-bottom:20px">
+        <div style="font-size:14px;font-weight:700">${communityData?.name || 'Mi Comunidad'}</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:4px">Código: <strong style="font-family:var(--mono);color:var(--accent)">${communityData?.code || '—'}</strong></div>
+        <p style="font-size:11px;color:var(--text-dim);margin-top:8px">Comparte este código con tus vecinos para que se unan</p>
+      </div>
+      <h2 class="section-title">Ajustes</h2>
+      ${['Editar nombre', 'Editar piso/puerta', 'Nombre de la comunidad'].map(s => `
+        <div class="menu-item" style="cursor:default">
+          <div style="flex:1;font-size:13px;font-weight:500">${s}</div>
+          <span style="color:var(--text-dim)">›</span>
+        </div>`).join('')}
+      <button id="logout-btn" style="width:100%;margin-top:20px;padding:14px;background:var(--danger-soft);border:none;border-radius:12px;color:var(--danger);font-size:14px;font-weight:600">Cerrar sesión</button>
+    `;
+    container.querySelector('#logout-btn')?.addEventListener('click', () => {
+      if (confirm('¿Cerrar sesión?')) signOut(auth);
+    });
+  }
+
+</script>
+</body>
+</html>
